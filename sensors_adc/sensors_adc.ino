@@ -8,9 +8,9 @@ int pressureSensorPin = A1;
 bool led_state = true;
 int ledPin = 13;           // select the pin for the LED
 
-float sensirion_convertToLMin(int raw)
+float sensirion_convertToLMin(int raw, int raw_max)
 {
-  return (212.5F * ( ((float)raw / 5.0F) - 1 ) ) - 10 ;
+  return (212.5F * ( ((float)raw / raw_max) - 1 ) ) - 10 ;
 }
 
 
@@ -36,7 +36,7 @@ void setup()
 void loop() 
 { 
   int rawFlow = analogRead(flowSensorPin) ;
-  float flowLmin = sensirion_convertToLMin(rawFlow);
+  float flowLmin = sensirion_convertToLMin(rawFlow, RAW_MAX);
 
   int rawPressure = analogRead(pressureSensorPin) ;
   float pressureMbar = honeywell_convertToPressure(rawPressure, P_MIN, P_MAX, RAW_MAX);
