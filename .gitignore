@@ -1,3 +1,5 @@
 libraries/
 .vscode/c_cpp_properties.json
 .vscode/arduino.json
+honeywell_i2c/.vscode/arduino.json
+honeywell_i2c/.vscode/c_cpp_properties.json
