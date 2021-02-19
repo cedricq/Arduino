@@ -10,7 +10,7 @@ int ledPin = 13;           // select the pin for the LED
 
 float sensirion_convertToLMin(int raw, int raw_max)
 {
-  return (212.5F * ( ((float)raw / raw_max) - 1 ) ) - 10 ;
+  return (212.5F * ( ((float)raw / raw_max) - 0.1 ) ) - 10 ;
 }
 
 
@@ -42,13 +42,15 @@ void loop()
   float pressureMbar = honeywell_convertToPressure(rawPressure, P_MIN, P_MAX, RAW_MAX);
 
   Serial.print("Raw flow : "); 
-  Serial.print(rawFlow); 
-  Serial.print("\tFlow (L/min) : "); 
+  Serial.print("0x");
+  Serial.print(rawFlow, HEX); 
+  Serial.print("   \tFlow (L/min) : "); 
   Serial.print(flowLmin);
 
   Serial.print("\t\tRaw pressure : "); 
-  Serial.print(rawPressure); 
-  Serial.print("\tPressure (mbar) : "); 
+  Serial.print("0x");
+  Serial.print(rawPressure, HEX); 
+  Serial.print("   \tPressure (mbar) : "); 
   Serial.println(pressureMbar);
   
   // turn the ledPin on
