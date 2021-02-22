@@ -1,12 +1,23 @@
-int flowSensorPin = A0;    
-int pressureSensorPin = A1;    
+int pressureSensorPin = A0;    
+int flowSensorPin = A1;    
+int controlFilteredPin = A2;  
+int potarPin = A3;
+int speedPin = A4;
+
+int controlPin = 5;   
 
 #define P_MIN     0.0      
 #define P_MAX     68.9476  // 1 psi in mbar
 #define RAW_MAX   1023     // ADC 10 bits : 2^10 - 1
+#define MAX_MEASURED_SPEED  60000.0   // Max measurable speed in rpm
 
 bool led_state = true;
 int ledPin = 13;           // select the pin for the LED
+
+float maxon_convertToRPM(int raw, int raw_max, float speed_max)
+{
+  return ( (float)raw * speed_max ) / raw_max ;
+}
 
 float sensirion_convertToLMin(int raw, int raw_max)
 {
@@ -35,23 +46,27 @@ void setup()
 
 void loop() 
 { 
+  int controlFiltered = analogRead(controlFilteredPin) ;
+  
+  int potar = analogRead(potarPin) ;
+  unsigned int output = map(potar, 0, 1023, 0, 255) ;
+  analogWrite(controlPin, output) ;
+
+  int rawSpeed = analogRead(speedPin) ;
+  float speedRPM = maxon_convertToRPM(rawSpeed, RAW_MAX * 4 / 5, MAX_MEASURED_SPEED) ;
+  
   int rawFlow = analogRead(flowSensorPin) ;
   float flowLmin = sensirion_convertToLMin(rawFlow, RAW_MAX);
 
   int rawPressure = analogRead(pressureSensorPin) ;
   float pressureMbar = honeywell_convertToPressure(rawPressure, P_MIN, P_MAX, RAW_MAX);
 
-  Serial.print("Raw flow : "); 
-  Serial.print("0x");
-  Serial.print(rawFlow, HEX); 
-  Serial.print("   \tFlow (L/min) : "); 
   Serial.print(flowLmin);
-
-  Serial.print("\t\tRaw pressure : "); 
-  Serial.print("0x");
-  Serial.print(rawPressure, HEX); 
-  Serial.print("   \tPressure (mbar) : "); 
-  Serial.println(pressureMbar);
+  Serial.print("\t");
+  Serial.print(pressureMbar);
+  Serial.print("\t");
+  Serial.print(speedRPM);
+  Serial.print("\n");
   
   // turn the ledPin on
   toggle_pin(ledPin);
